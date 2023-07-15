@@ -31,4 +31,9 @@ class MovieViewModel : ViewModel() {
             }
         }
     }
+    fun getMovieById(id: String?): Movie {
+        return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "Unknown", "", false)
+    }
 }
+
+

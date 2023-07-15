@@ -1,10 +1,12 @@
 package com.example.movie_list_api
 
+import Movie
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,26 +29,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import viewmodel.MovieViewModel
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        val vm = MovieViewModel()
         super.onCreate(savedInstanceState)
+        val vm = MovieViewModel()
         setContent {
             MaterialTheme {
-                MovieView(vm)
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "movie_list") {
+                    composable("movie_list") {
+                        MovieView(vm, navController)
+                    }
+                    composable("movie_details/{movieId}") { backStackEntry ->
+                        val movieId = backStackEntry.arguments?.getString("movieId")
+                        val movie = vm.getMovieById(movieId)
+                        MovieDetailsView(movie)
+                    }
+                }
             }
         }
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MovieView(vm: MovieViewModel) {
+fun MovieView(vm: MovieViewModel, navController: NavController) {
 
     LaunchedEffect(Unit, block = {
         vm.getMovieList()
@@ -66,7 +82,8 @@ fun MovieView(vm: MovieViewModel) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(16.dp)
+                                .clickable { navController.navigate("movie_details/${movie.id}") },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -98,3 +115,13 @@ fun MovieView(vm: MovieViewModel) {
         }
     )
 }
+
+@Composable
+fun MovieDetailsView(movie: Movie) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = movie.title, style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = movie.overview, style = MaterialTheme.typography.bodyLarge)
+    }
+}
+
