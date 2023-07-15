@@ -12,9 +12,6 @@ data class Movie(
     var isFavorite: Boolean = false
 )
 
-
-
-
 const val BASE_URL = "https://api.themoviedb.org/3/"
 
 interface TMDBService {
@@ -36,4 +33,3 @@ interface TMDBService {
         }
     }
 }
-
