@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class MovieViewModel : ViewModel( {
+class MovieViewModel : ViewModel() {
     private val _movieList = mutableStateListOf<Movie>()
     var errorMessage: String by mutableStateOf("")
     val movieList: List<Movie>

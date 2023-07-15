@@ -28,6 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import viewmodel.MovieViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.rememberImagePainter
 
 class MainActivity : ComponentActivity() {
 
@@ -77,6 +81,12 @@ fun MovieView(vm: MovieViewModel) {
                                             .fillMaxWidth()
                                             .padding(0.dp, 0.dp, 16.dp, 0.dp)
                                     ) {
+                                        Image(
+                                            painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                                            contentDescription = "Movie Poster",
+                                            modifier = Modifier.size(100.dp),
+                                            contentScale = ContentScale.Crop
+                                        )
                                         Text(
                                             movie.title,
                                             maxLines = 1,
