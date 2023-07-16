@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,8 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,43 +58,71 @@ class MainActivity : ComponentActivity() {
                         MovieDetailsView(movie)
                     }
                     composable("favorites") {
-                        FavoritesView(vm)
+                        FavoritesView(vm, navController)
                     }
                 }
+
             }
         }
     }
 }
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesView(vm: MovieViewModel) {
-    val favoriteMovies = vm.movieList.filter { it.isFavorite }
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-        items(favoriteMovies) { movie ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                    contentDescription = "Movie Poster",
-                    modifier = Modifier.size(100.dp),
-                    contentScale = ContentScale.Crop
+fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Favoris")
+                })
+        },
+        bottomBar = {
+            BottomNavigation {
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
+                    selected = false,
+                    onClick = { navController.navigate("movie_list") }
                 )
-                Text(
-                    movie.title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                BottomNavigationItem(
+                    icon = { Icon(Icons.Filled.FavoriteBorder, contentDescription = null) },
+                    selected = false,
+                    onClick = { }
                 )
             }
-            Divider()
+        },
+        content = {
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                items(vm.favoriteMovies) { movie ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                            contentDescription = "Movie Poster",
+                            modifier = Modifier.size(100.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                        Text(
+                            movie.title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f).padding(start = 8.dp)
+                        )
+                    }
+                    Divider()
+                }
+            }
         }
-    }
+    )
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -147,10 +178,13 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             )
-                            IconButton(onClick = { movie.isFavorite = !movie.isFavorite }) {
+                            val isFavorite = vm.isFavorite(movie)
+                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Red else Color.Gray)
+                            IconButton(onClick = { vm.toggleFavorite(movie) }) {
                                 Icon(
-                                    imageVector = if (movie.isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                    contentDescription = "Favorite Button"
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                    contentDescription = "Favorite Button",
+                                    tint = favoriteColor
                                 )
                             }
                         }
@@ -163,6 +197,8 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
         }
     )
 }
+
+
 
 
 

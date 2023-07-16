@@ -1,6 +1,7 @@
 package viewmodel
 
 import Movie
+import TMDBService
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -12,9 +13,12 @@ import kotlinx.coroutines.launch
 
 class MovieViewModel : ViewModel() {
     private val _movieList = mutableStateListOf<Movie>()
+    private val _favoriteMovies = mutableStateListOf<Movie>()
     var errorMessage: String by mutableStateOf("")
     val movieList: List<Movie>
         get() = _movieList
+    val favoriteMovies: List<Movie>
+        get() = _favoriteMovies
 
     fun getMovieList() {
         viewModelScope.launch {
@@ -30,6 +34,18 @@ class MovieViewModel : ViewModel() {
                 Log.e("MovieViewModel", "Error fetching movies: $errorMessage")
             }
         }
+    }
+
+    fun toggleFavorite(movie: Movie) {
+        if (_favoriteMovies.contains(movie)) {
+            _favoriteMovies.remove(movie)
+        } else {
+            _favoriteMovies.add(movie)
+        }
+    }
+
+    fun isFavorite(movie: Movie): Boolean {
+        return _favoriteMovies.contains(movie)
     }
     fun getMovieById(id: String?): Movie {
         return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "Unknown", "", false)
