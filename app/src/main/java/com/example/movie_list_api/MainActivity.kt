@@ -119,29 +119,31 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
             }
         },
         content = {
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-                items(vm.favoriteMovies) { movie ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                            contentDescription = "Movie Poster",
-                            modifier = Modifier.size(100.dp),
-                            contentScale = ContentScale.Crop
-                        )
-                        Text(
-                            movie.title,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f).padding(start = 8.dp)
-                        )
+            Box(modifier = Modifier.padding(top = 56.dp)) {
+                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                    items(vm.favoriteMovies) { movie ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                                contentDescription = "Movie Poster",
+                                modifier = Modifier.size(100.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                            Text(
+                                movie.title,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                            )
+                        }
+                        Divider()
                     }
-                    Divider()
                 }
             }
         }
@@ -205,44 +207,53 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 
         },
         content = {
-            if (vm.errorMessage.isEmpty()) {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
-                    items(vm.movieList) { movie ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .clickable { navController.navigate("movie_details/${movie.id}") },
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                                contentDescription = "Movie Poster",
-                                modifier = Modifier.size(100.dp),
-                                contentScale = ContentScale.Crop
-                            )
-                            Text(
-                                movie.title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
-                            )
-                            val isFavorite = vm.isFavorite(movie)
-                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
-                            IconButton(onClick = { vm.toggleFavorite(movie) }) {
-                                Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                    contentDescription = "Favorite Button",
-                                    tint = favoriteColor
+            Box(modifier = Modifier.padding(top = 56.dp)) {
+                if (vm.errorMessage.isEmpty()) {
+                    LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                        items(vm.movieList) { movie ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clickable { navController.navigate("movie_details/${movie.id}") },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                                    contentDescription = "Movie Poster",
+                                    modifier = Modifier
+                                        .size(
+                                            width = 100.dp,
+                                            height = 150.dp
+                                        ) // adjust this to fit your needs
+                                        .aspectRatio(500f / 750f),
+                                    contentScale = ContentScale.Crop
                                 )
+
+
+                                Text(
+                                    movie.title,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f).padding(start = 8.dp)
+                                )
+                                val isFavorite = vm.isFavorite(movie)
+                                val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
+                                IconButton(onClick = { vm.toggleFavorite(movie) }) {
+                                    Icon(
+                                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                        contentDescription = "Favorite Button",
+                                        tint = favoriteColor
+                                    )
+                                }
                             }
+                            Divider()
                         }
-                        Divider()
                     }
+                } else {
+                    Text(vm.errorMessage)
                 }
-            } else {
-                Text(vm.errorMessage)
             }
         }
     )
