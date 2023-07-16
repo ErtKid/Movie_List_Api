@@ -47,9 +47,17 @@ class MovieViewModel : ViewModel() {
     fun isFavorite(movie: Movie): Boolean {
         return _favoriteMovies.contains(movie)
     }
+
     fun getMovieById(id: String?): Movie {
-        return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "Unknown", "", false)
+        return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "Unknown", "", 0f, 0, false)
+    }
+
+    // New methods to get the average rating and vote count of a movie
+    fun getAverageRating(movie: Movie): Float {
+        return movie.vote_average
+    }
+
+    fun getVoteCount(movie: Movie): Int {
+        return movie.vote_count
     }
 }
-
-

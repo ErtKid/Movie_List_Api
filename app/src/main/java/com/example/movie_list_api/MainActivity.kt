@@ -35,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -150,6 +152,34 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
     )
 }
 
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    numStars: Int = 5,
+    size: Dp = 26.dp,
+    spacing: Dp = 0.dp,
+    rating: Float = 0f,
+    isIndicator: Boolean = false,
+    activeColor: Color = Color.Yellow,
+    inactiveColor: Color = Color.Gray,
+    onRatingChanged: (Float) -> Unit = {}
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
+        for (i in 1..numStars) {
+            val starRating = i.toFloat()
+            IconButton(onClick = { if (!isIndicator) onRatingChanged(starRating) }) {
+                Icon(
+                    painter = painterResource(
+                        id = if (rating >= starRating) R.drawable.ic_star_filled else R.drawable.ic_star_outline
+                    ),
+                    contentDescription = "Star",
+                    tint = if (rating >= starRating) activeColor else inactiveColor,
+                    modifier = Modifier.size(size)
+                )
+            }
+        }
+    }
+}
 
 
 
@@ -231,13 +261,24 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                     contentScale = ContentScale.Crop
                                 )
 
+                                Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
+                                    Text(
+                                        movie.title,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                    RatingBar(
+                                        rating = movie.vote_average / 2, // Assuming vote_average is out of 10
+                                        isIndicator = true,
+                                        activeColor = Color.Yellow,
+                                        inactiveColor = Color.Gray,
+                                    )
+                                    Text(
+                                        "Votes: ${movie.vote_count}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
 
-                                Text(
-                                    movie.title,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.weight(1f).padding(start = 8.dp)
-                                )
                                 val isFavorite = vm.isFavorite(movie)
                                 val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
                                 IconButton(onClick = { vm.toggleFavorite(movie) }) {
@@ -258,6 +299,8 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
         }
     )
 }
+
+
 
 
 
