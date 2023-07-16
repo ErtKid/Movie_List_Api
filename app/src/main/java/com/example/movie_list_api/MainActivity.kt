@@ -1,7 +1,6 @@
 package com.example.movie_list_api
 
 import Movie
-
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,6 +16,8 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +29,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,6 +42,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
+import com.example.movie_list_api.ui.theme.Movie_List_APITheme
 import viewmodel.MovieViewModel
 
 class MainActivity : ComponentActivity() {
@@ -46,7 +50,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val vm = MovieViewModel()
         setContent {
-            MaterialTheme {
+            Movie_List_APITheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "movie_list") {
                     composable("movie_list") {
@@ -61,11 +65,11 @@ class MainActivity : ComponentActivity() {
                         FavoritesView(vm, navController)
                     }
                 }
-
             }
         }
     }
 }
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,16 +83,38 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
                 })
         },
         bottomBar = {
-            BottomNavigation {
+            val currentRoute = remember { mutableStateOf("favorites") }
+
+            BottomNavigation(
+                backgroundColor = MaterialTheme.colorScheme.surface,
+            ) {
                 BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                    selected = false,
-                    onClick = { navController.navigate("movie_list") }
+                    icon = {
+                        Icon(
+                            Icons.Filled.Home,
+                            contentDescription = null,
+                            tint = if (currentRoute.value == "movie_list") Color.Green else Color.White
+                        )
+                    },
+                    selected = currentRoute.value == "movie_list",
+                    onClick = {
+                        currentRoute.value = "movie_list"
+                        navController.navigate("movie_list")
+                    }
                 )
                 BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.FavoriteBorder, contentDescription = null) },
-                    selected = false,
-                    onClick = { }
+                    icon = {
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = if (currentRoute.value == "favorites") Color.Green else Color.White
+                        )
+                    },
+                    selected = currentRoute.value == "favorites",
+                    onClick = {
+                        currentRoute.value = "favorites"
+                        navController.navigate("favorites")
+                    }
                 )
             }
         },
@@ -124,6 +150,7 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
 
 
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -141,18 +168,41 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                 })
         },
         bottomBar = {
-            BottomNavigation {
+            val currentRoute = remember { mutableStateOf("movie_list") } // change this to keep track of the current route
+
+            BottomNavigation(
+                backgroundColor = MaterialTheme.colorScheme.surface, // change this to your desired color
+            ) {
                 BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                    selected = false,
-                    onClick = {  }
+                    icon = {
+                        Icon(
+                            Icons.Filled.Home,
+                            contentDescription = null,
+                            tint = if (currentRoute.value == "movie_list") Color.Green else Color.White // change this to your desired colors
+                        )
+                    },
+                    selected = currentRoute.value == "movie_list",
+                    onClick = {
+                        currentRoute.value = "movie_list"
+                        navController.navigate("movie_list")
+                    }
                 )
                 BottomNavigationItem(
-                    icon = { Icon(Icons.Filled.FavoriteBorder, contentDescription = null) },
-                    selected = false,
-                    onClick = {navController.navigate("favorites")}
+                    icon = {
+                        Icon(
+                            Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = if (currentRoute.value == "favorites") Color.Green else Color.White // change this to your desired colors
+                        )
+                    },
+                    selected = currentRoute.value == "favorites",
+                    onClick = {
+                        currentRoute.value = "favorites"
+                        navController.navigate("favorites")
+                    }
                 )
             }
+
         },
         content = {
             if (vm.errorMessage.isEmpty()) {
@@ -179,7 +229,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                 modifier = Modifier.weight(1f).padding(start = 8.dp)
                             )
                             val isFavorite = vm.isFavorite(movie)
-                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Red else Color.Gray)
+                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
                             IconButton(onClick = { vm.toggleFavorite(movie) }) {
                                 Icon(
                                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
