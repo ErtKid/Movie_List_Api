@@ -149,7 +149,17 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
                                     .weight(1f)
                                     .padding(start = 8.dp)
                             )
+                            val isFavorite = vm.isFavorite(movie)
+                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
+                            IconButton(onClick = { vm.toggleFavorite(movie) }) {
+                                Icon(
+                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                    contentDescription = "Favorite Button",
+                                    tint = favoriteColor
+                                )
+                            }
                         }
+
                         Divider()
                     }
                 }
