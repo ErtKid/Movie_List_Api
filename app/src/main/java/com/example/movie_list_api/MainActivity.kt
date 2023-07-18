@@ -173,17 +173,22 @@ fun RatingBar(
     modifier: Modifier = Modifier,
     numStars: Int = 5,
     size: Dp = 26.dp,
-    spacing: Dp = 0.dp,
+    spacing: Dp = 0.dp, // Réduit l'espacement entre les étoiles à -12.dp
     rating: Float = 0f,
     isIndicator: Boolean = false,
-    activeColor: Color = Color.Yellow,
+    activeColor: Color = Color.Green,
     inactiveColor: Color = Color.Gray,
     onRatingChanged: (Float) -> Unit = {}
 ) {
-    Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(spacing)) {
+    Row(modifier = modifier) {
         for (i in 1..numStars) {
             val starRating = i.toFloat()
-            IconButton(onClick = { if (!isIndicator) onRatingChanged(starRating) }) {
+            IconButton(
+                onClick = { if (!isIndicator) onRatingChanged(starRating) },
+                modifier = Modifier
+                    .size(size)
+                    .offset(if (i > 1) spacing else 0.dp, 0.dp) // Ajuste le décalage pour éviter le chevauchement
+            ) {
                 Icon(
                     painter = painterResource(
                         id = if (rating >= starRating) R.drawable.ic_star_filled else R.drawable.ic_star_outline
@@ -196,6 +201,9 @@ fun RatingBar(
         }
     }
 }
+
+
+
 
 
 
@@ -289,9 +297,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                     )
                                     RatingBar(
                                         rating = movie.vote_average / 2, // Assuming vote_average is out of 10
-                                        isIndicator = true,
-                                        activeColor = Color.Yellow,
-                                        inactiveColor = Color.Gray,
+
                                     )
                                     Text(
                                         "Votes: ${movie.vote_count}",
@@ -381,9 +387,6 @@ fun MovieDetailsView(vm: MovieViewModel, movie: Movie, navController: NavControl
                 ) {
                     RatingBar(
                         rating = movie.vote_average / 2, // Assuming vote_average is out of 10
-                        isIndicator = true,
-                        activeColor = Color.Yellow,
-                        inactiveColor = Color.Gray,
                     )
                     Text(
                         "Votes: ${movie.vote_count}",
