@@ -11,6 +11,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
@@ -336,70 +338,79 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailsView(vm: MovieViewModel, movie: Movie, navController: NavController) {
-
-
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = movie.title, style = MaterialTheme.typography.titleLarge) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                        }
-                    },
-                    actions = {
-                        val isFavorite = vm.isFavorite(movie)
-                        val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
-                        IconButton(onClick = { vm.toggleFavorite(movie) }) {
-                            Icon(
-                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                contentDescription = "Favorite Button",
-                                tint = favoriteColor
-                            )
-                        }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = movie.title, style = MaterialTheme.typography.titleLarge) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
-                )
-            },
+                },
+                actions = {
+                    val isFavorite = vm.isFavorite(movie)
+                    val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
+                    IconButton(onClick = { vm.toggleFavorite(movie) }) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = "Favorite Button",
+                            tint = favoriteColor
+                        )
+                    }
+                }
+            )
+        },
         content = {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .offset(y = 50.dp) // Ajoute un décalage vertical pour déplacer la colonne vers le bas
             ) {
-                Box(
+                Image(
+                    painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                    contentDescription = "Movie Poster",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f)
-                ) {
-                    Image(
-                        painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                        contentDescription = "Movie Poster",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(500f / 750f),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                        .aspectRatio(500f / 600f)
+                        .padding(17.dp)
+                        .align(Alignment.CenterHorizontally) // Centre l'image horizontalement dans la colonne
+                )
 
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                        .verticalScroll(rememberScrollState()) // Permet le défilement vertical de la colonne
+                        .padding(bottom = 36.dp)
                 ) {
                     RatingBar(
                         rating = movie.vote_average / 2, // Assuming vote_average is out of 10
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     Text(
                         "Votes: ${movie.vote_count}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text(text = movie.overview, style = MaterialTheme.typography.bodyLarge)
-
+                    Text(
+                        text = movie.overview,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
                 }
             }
         }
     )
 }
+
+
+
+
+
+
+
+
+
+
 
 
 
