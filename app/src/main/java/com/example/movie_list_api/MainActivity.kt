@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
                     composable("movie_details/{movieId}") { backStackEntry ->
                         val movieId = backStackEntry.arguments?.getString("movieId")
                         val movie = vm.getMovieById(movieId)
-                        MovieDetailsView(movie)
+                        MovieDetailsView(vm, movie, navController )
                     }
                     composable("favorites") {
                         FavoritesView(vm, navController)
@@ -122,7 +124,9 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
         },
         content = {
             Box(modifier = Modifier.padding(top = 56.dp)) {
-                LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                LazyColumn(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 8.dp)) {
                     items(vm.favoriteMovies) { movie ->
                         Row(
                             modifier = Modifier
@@ -141,7 +145,9 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
                                 movie.title,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f).padding(start = 8.dp)
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)
                             )
                         }
                         Divider()
@@ -239,7 +245,9 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
         content = {
             Box(modifier = Modifier.padding(top = 56.dp)) {
                 if (vm.errorMessage.isEmpty()) {
-                    LazyColumn(modifier = Modifier.fillMaxSize().padding(top = 8.dp)) {
+                    LazyColumn(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp)) {
                         items(vm.movieList) { movie ->
                             Row(
                                 modifier = Modifier
@@ -261,7 +269,9 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                     contentScale = ContentScale.Crop
                                 )
 
-                                Column(modifier = Modifier.weight(1f).padding(start = 8.dp)) {
+                                Column(modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp)) {
                                     Text(
                                         movie.title,
                                         maxLines = 1,
@@ -306,14 +316,79 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieDetailsView(movie: Movie) {
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = movie.title, style = MaterialTheme.typography.titleLarge)
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(text = movie.overview, style = MaterialTheme.typography.bodyLarge)
+fun MovieDetailsView(vm: MovieViewModel, movie: Movie, navController: NavController) {
 
-    }
 
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = movie.title, style = MaterialTheme.typography.titleLarge) },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    actions = {
+                        val isFavorite = vm.isFavorite(movie)
+                        val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
+                        IconButton(onClick = { vm.toggleFavorite(movie) }) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = "Favorite Button",
+                                tint = favoriteColor
+                            )
+                        }
+                    }
+                )
+            },
+        content = {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    Image(
+                        painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                        contentDescription = "Movie Poster",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(500f / 750f),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    RatingBar(
+                        rating = movie.vote_average / 2, // Assuming vote_average is out of 10
+                        isIndicator = true,
+                        activeColor = Color.Yellow,
+                        inactiveColor = Color.Gray,
+                    )
+                    Text(
+                        "Votes: ${movie.vote_count}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(text = movie.overview, style = MaterialTheme.typography.bodyLarge)
+
+                }
+            }
+        }
+    )
 }
+
+
+
+
 
