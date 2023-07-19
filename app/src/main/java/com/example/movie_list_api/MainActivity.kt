@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -39,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -128,50 +130,76 @@ fun FavoritesView(vm: MovieViewModel, navController: NavHostController) {
             }
         },
         content = {
-            Box(modifier = Modifier.padding(top = 56.dp)) {
-                LazyColumn(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 8.dp)) {
-                    items(vm.favoriteMovies) { movie ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                                contentDescription = "Movie Poster",
-                                modifier = Modifier.size(100.dp),
-                                contentScale = ContentScale.Crop
-                            )
-                            Text(
-                                movie.title,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
+            Box(modifier = Modifier.fillMaxSize().padding(top = 56.dp)) {
+                if (vm.favoriteMovies.isEmpty()) {
+                    Text("There are no films in favorites", modifier = Modifier.align(Alignment.Center))
+                } else {
+                    LazyColumn(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp)) {
+                        items(vm.favoriteMovies) { movie ->
+                            Row(
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 8.dp)
-                            )
-                            val isFavorite = vm.isFavorite(movie)
-                            val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
-                            IconButton(onClick = { vm.toggleFavorite(movie) }) {
-                                Icon(
-                                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                    contentDescription = "Favorite Button",
-                                    tint = favoriteColor
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clip(RoundedCornerShape(10.dp)) // Clip the row with rounded corners
+                                    .clickable { navController.navigate("movie_details/${movie.id}") }, // Add navigation to movie details
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                                    contentDescription = "Movie Poster",
+                                    modifier = Modifier
+                                        .size(
+                                            width = 100.dp,
+                                            height = 150.dp
+                                        ) // adjust this to fit your needs
+                                        .aspectRatio(500f / 750f)
+                                        .clip(RoundedCornerShape(10.dp)), // Clip the image with rounded corners
+                                    contentScale = ContentScale.Crop
                                 )
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 8.dp)
+                                ) {
+                                    Text(
+                                        movie.title,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        "Votes: ${vm.getVoteCount(movie)}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "Release Date: ${movie.release_date}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                                val isFavorite = vm.isFavorite(movie)
+                                val favoriteColor by animateColorAsState(if (isFavorite) Color.Green else Color.Gray)
+                                IconButton(onClick = { vm.toggleFavorite(movie) }) {
+                                    Icon(
+                                        imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                        contentDescription = "Favorite Button",
+                                        tint = favoriteColor
+                                    )
+                                }
                             }
-                        }
 
-                        Divider()
+                            Divider()
+                        }
                     }
                 }
             }
         }
     )
 }
+
+
+
 
 @Composable
 fun RatingBar(
@@ -223,6 +251,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
     LaunchedEffect(Unit, block = {
         vm.getMovieList()
     })
+
 
     Scaffold(
         topBar = {
@@ -308,7 +337,8 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                             width = 100.dp,
                                             height = 150.dp
                                         ) // adjust this to fit your needs
-                                        .aspectRatio(500f / 750f),
+                                        .aspectRatio(500f / 750f)
+                                        .clip(RoundedCornerShape(10.dp)), // Clip the image with rounded corners
                                     contentScale = ContentScale.Crop
                                 )
 
@@ -317,8 +347,9 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                     .padding(start = 8.dp)) {
                                     Text(
                                         movie.title,
-                                        maxLines = 1,
+                                        maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
+                                        style = MaterialTheme.typography.bodyLarge,
                                     )
                                     RatingBar(
                                         rating = movie.vote_average / 2, // Assuming vote_average is out of 10
@@ -326,6 +357,10 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                                     )
                                     Text(
                                         "Votes: ${movie.vote_count}",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        "Date release : ${movie.release_date}",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
                                 }

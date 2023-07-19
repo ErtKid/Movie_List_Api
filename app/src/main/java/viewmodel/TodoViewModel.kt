@@ -49,8 +49,11 @@ class MovieViewModel : ViewModel() {
     }
 
     fun getMovieById(id: String?): Movie {
-        return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "Unknown", "", 0f, 0, false)
+        return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "", "Unknown", "", 0f, 0, false)
     }
+
+
+
 
     // New methods to get the average rating and vote count of a movie
     fun getAverageRating(movie: Movie): Float {
