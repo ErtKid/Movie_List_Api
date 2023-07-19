@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -396,6 +397,15 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieDetailsView(vm: MovieViewModel, movie: Movie, navController: NavController) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = with(LocalConfiguration.current) { screenWidthDp.dp }
+    val screenHeight = with(LocalConfiguration.current) { screenHeightDp.dp }
+    val difference = screenHeight - screenWidth
+    val isLandscape = difference < (screenHeight * 0.15f)
+
+
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -419,46 +429,87 @@ fun MovieDetailsView(vm: MovieViewModel, movie: Movie, navController: NavControl
             )
         },
         content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset(y = 50.dp) // Ajoute un décalage vertical pour déplacer la colonne vers le bas
-            ) {
-                Image(
-                    painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
-                    contentDescription = "Movie Poster",
+            if (isLandscape) {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(500f / 600f)
-                        .padding(17.dp)
-                        .align(Alignment.CenterHorizontally) // Centre l'image horizontalement dans la colonne
-                )
+                        .fillMaxSize()
+                        .offset(y = 50.dp) // Ajoute un décalage vertical pour déplacer la colonne vers le bas
+                ) {
+                    Image(
+                        painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                        contentDescription = "Movie Poster",
+                        modifier = Modifier
+                            .weight(5f) // Ajuste le poids pour que l'image et le contenu se partagent l'espace
+                            .aspectRatio(500f / 600f)
+                            .padding(17.dp)
+                    )
 
+                    Column(
+                        modifier = Modifier
+                            .weight(5f) // Ajuste le poids pour que l'image et le contenu se partagent l'espace
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()) // Permet le défilement vertical de la colonne
+                            .padding(bottom = 36.dp)
+                    ) {
+                        RatingBar(
+                            rating = movie.vote_average / 2, // Assuming vote_average is out of 10
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            "Votes: ${movie.vote_count}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = movie.overview,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+            } else {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()) // Permet le défilement vertical de la colonne
-                        .padding(bottom = 36.dp)
+                        .fillMaxSize()
+                        .offset(y = 50.dp) // Ajoute un décalage vertical pour déplacer la colonne vers le bas
                 ) {
-                    RatingBar(
-                        rating = movie.vote_average / 2, // Assuming vote_average is out of 10
-                        modifier = Modifier.padding(bottom = 8.dp)
+                    Image(
+                        painter = rememberImagePainter("https://image.tmdb.org/t/p/w500${movie.poster_path}"),
+                        contentDescription = "Movie Poster",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(500f / 600f)
+                            .padding(17.dp)
+                            .align(Alignment.CenterHorizontally) // Centre l'image horizontalement dans la colonne
                     )
-                    Text(
-                        "Votes: ${movie.vote_count}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(
-                        text = movie.overview,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()) // Permet le défilement vertical de la colonne
+                            .padding(bottom = 36.dp)
+                    ) {
+                        RatingBar(
+                            rating = movie.vote_average / 2, // Assuming vote_average is out of 10
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            "Votes: ${movie.vote_count}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Text(
+                            text = movie.overview,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 }
             }
         }
     )
 }
+
+
 
 
 
