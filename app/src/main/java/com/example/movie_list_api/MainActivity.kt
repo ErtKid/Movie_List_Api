@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,12 +29,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -214,6 +217,9 @@ fun RatingBar(
 @Composable
 fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 
+    var searchOpen by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
+
     LaunchedEffect(Unit, block = {
         vm.getMovieList()
     })
@@ -222,8 +228,25 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Movies")
-                })
+                    if (searchOpen) {
+                        TextField(
+                            value = searchText,
+                            onValueChange = { newText ->
+                                searchText = newText
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            placeholder = { Text("Search") }
+                        )
+                    } else {
+                        Text("Movies")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { searchOpen = !searchOpen }) {
+                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                    }
+                }
+            )
         },
         bottomBar = {
             val currentRoute = remember { mutableStateOf("movie_list") } // change this to keep track of the current route
@@ -268,7 +291,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
                     LazyColumn(modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 8.dp)) {
-                        items(vm.movieList) { movie ->
+                        items(vm.getFilteredMovies(searchText)) { movie ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()

@@ -60,4 +60,11 @@ class MovieViewModel : ViewModel() {
     fun getVoteCount(movie: Movie): Int {
         return movie.vote_count
     }
+
+    fun getFilteredMovies(searchText: String): List<Movie> {
+        return movieList.filter { movie ->
+            movie.title.contains(searchText, ignoreCase = true)
+        }
+    }
+
 }
