@@ -2,7 +2,7 @@
 Movie List App est une application Android développée en Kotlin qui permet aux utilisateurs de parcourir une liste de films populaires, à venir ou ceux qui sont les mieux notés. Les utilisateurs peuvent également marquer les films comme favoris et rechercher des films spécifiques.
 
 ## Fonctionnalités
- 1. Affichage d'une liste de films populaires, à venir et/ou les mieux notés.
+ 1. Affichage d'une liste de films populaires, à venir ou les mieux notés.
  2. Possibilité de marquer les films comme favoris.
  3. Recherche de films spécifiques.
  4. Affichage des détails d'un film sélectionné, y compris le titre, la date de sortie, l'affiche, la note moyenne et le nombre de votes.
