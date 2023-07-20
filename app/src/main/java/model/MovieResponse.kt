@@ -1,6 +1,4 @@
-package com.example.movie_list_api
-
-import Movie
+package model
 
 data class MovieResponse(
     val page: Int,
