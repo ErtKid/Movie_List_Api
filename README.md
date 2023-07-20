@@ -21,27 +21,18 @@ Movie List App est une application Android développée en Kotlin qui permet aux
    
 ## Captures d'écran de l'application
 
-<div style="display: flex; flex-wrap: wrap; justify-content: center;">
+| HomePage | HomePage with Upcoming filter |
+| :---: | :---: |
+| <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/8a13c83d-73e3-4209-a65f-a755ee126b9b.png" width="300"> | <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/af3b43cf-7093-48f9-8500-be0616b0a2f4.png" width="300"> |
 
-  <div style="margin: 10px;">
-    <h3>HomePage</h3>
-    <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/bea304f3-eca3-4f22-806e-fe4408da7168.png" width="300">
-  </div>
+| Details view | Favoris view |
+| :---: | :---: |
+| <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/a8f7a6ee-1e38-494f-b218-2feac12ec78d.png" width="300"> | <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/4c79ae37-b947-49e1-8cb7-7329f5b42bf1.png" width="300"> |
 
-  <div style="margin: 10px;">
-    <h3>HomePage with Upcoming filter</h3>
-    <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/af3b43cf-7093-48f9-8500-be0616b0a2f4.png" width="300">
-  </div>
+| HomePage with searchbar |
+| :---: |
+| <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/78dab316-20b3-45b4-b8cd-0c8eed9e3cd7.png" width="300"> |
 
-  <div style="margin: 10px;">
-    <h3>Details view</h3>
-    <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/a8f7a6ee-1e38-494f-b218-2feac12ec78d.png" width="300">
-  </div>
 
-  <div style="margin: 10px;">
-    <h3>Favoris view</h3>
-    <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/4c79ae37-b947-49e1-8cb7-7329f5b42bf1.png" width="300">
-  </div>
 
-</div>
 
