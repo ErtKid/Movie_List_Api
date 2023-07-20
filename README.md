@@ -33,6 +33,7 @@ Movie List App est une application Android développée en Kotlin qui permet aux
 | :---: |
 | <img src="https://github.com/ErtKid/Movie_List_Api/assets/113423631/78dab316-20b3-45b4-b8cd-0c8eed9e3cd7.png" width="300"> |
 
-
+# Auteur
+Maxime Avrillon-Thade
 
 
