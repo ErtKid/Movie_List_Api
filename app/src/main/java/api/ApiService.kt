@@ -21,6 +21,12 @@ interface TMDBService {
     @GET("movie/popular")
     suspend fun getPopularMovies(@Query("api_key") apiKey: String = "957e7a9ff73d40dea9a84555661b63d1"): MovieResponse
 
+    @GET("movie/top_rated")
+    suspend fun getTopRatedMovies(@Query("api_key") apiKey: String = "957e7a9ff73d40dea9a84555661b63d1"): MovieResponse
+
+    @GET("movie/upcoming")
+    suspend fun getUpcomingMovies(@Query("api_key") apiKey: String = "957e7a9ff73d40dea9a84555661b63d1"): MovieResponse
+
     companion object {
         var tmdbService: TMDBService? = null
         fun getInstance(): TMDBService {

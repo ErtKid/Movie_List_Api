@@ -29,6 +29,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
@@ -248,35 +250,54 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 
     var searchOpen by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableStateOf(0) } // New state to track the selected tab
 
-    LaunchedEffect(Unit, block = {
-        vm.getMovieList()
-    })
-
+    // Update the movie list based on the selected tab
+    LaunchedEffect(selectedTab) {
+        when (selectedTab) {
+            0 -> vm.getPopularMovieList()
+            1 -> vm.getTopRatedMovieList()
+            2 -> vm.getUpcomingMovieList()
+        }
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    if (searchOpen) {
-                        TextField(
-                            value = searchText,
-                            onValueChange = { newText ->
-                                searchText = newText
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                            placeholder = { Text("Search") }
-                        )
-                    } else {
-                        Text("Movies")
+            Column {
+                TopAppBar(
+                    title = {
+                        if (searchOpen) {
+                            TextField(
+                                value = searchText,
+                                onValueChange = { newText ->
+                                    searchText = newText
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                placeholder = { Text("Search") }
+                            )
+                        } else {
+                            Text("Movies")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { searchOpen = !searchOpen }) {
+                            Icon(Icons.Filled.Search, contentDescription = "Search")
+                        }
                     }
-                },
-                actions = {
-                    IconButton(onClick = { searchOpen = !searchOpen }) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search")
+                )
+                // New TabRow for the three categories
+                TabRow(selectedTabIndex = selectedTab) {
+                    Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }) {
+                        Text("Popular")
+                    }
+                    Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }) {
+                        Text("Top Rated")
+                    }
+                    Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }) {
+                        Text("Upcoming")
                     }
                 }
-            )
+            }
         },
         bottomBar = {
             val currentRoute = remember { mutableStateOf("movie_list") } // change this to keep track of the current route
@@ -316,7 +337,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
 
         },
         content = {
-            Box(modifier = Modifier.padding(top = 56.dp)) {
+            Box(modifier = Modifier.padding(top = 80.dp)) {
                 if (vm.errorMessage.isEmpty()) {
                     LazyColumn(modifier = Modifier
                         .fillMaxSize()
@@ -386,6 +407,7 @@ fun MovieView(vm: MovieViewModel, navController: NavHostController) {
         }
     )
 }
+
 
 
 

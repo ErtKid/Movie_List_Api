@@ -20,7 +20,7 @@ class MovieViewModel : ViewModel() {
     val favoriteMovies: List<Movie>
         get() = _favoriteMovies
 
-    fun getMovieList() {
+    fun getPopularMovieList() {
         viewModelScope.launch {
             val tmdbService = TMDBService.getInstance()
             try {
@@ -32,6 +32,38 @@ class MovieViewModel : ViewModel() {
             } catch (e: Exception) {
                 errorMessage = e.message.toString()
                 Log.e("MovieViewModel", "Error fetching movies: $errorMessage")
+            }
+        }
+    }
+
+    fun getTopRatedMovieList() {
+        viewModelScope.launch {
+            val tmdbService = TMDBService.getInstance()
+            try {
+                _movieList.clear()
+                val response = tmdbService.getTopRatedMovies()
+                _movieList.addAll(response.results)
+                Log.d("MovieViewModel", "Top rated movies fetched: ${_movieList.size}")
+
+            } catch (e: Exception) {
+                errorMessage = e.message.toString()
+                Log.e("MovieViewModel", "Error fetching top rated movies: $errorMessage")
+            }
+        }
+    }
+
+    fun getUpcomingMovieList() {
+        viewModelScope.launch {
+            val tmdbService = TMDBService.getInstance()
+            try {
+                _movieList.clear()
+                val response = tmdbService.getUpcomingMovies()
+                _movieList.addAll(response.results)
+                Log.d("MovieViewModel", "Upcoming movies fetched: ${_movieList.size}")
+
+            } catch (e: Exception) {
+                errorMessage = e.message.toString()
+                Log.e("MovieViewModel", "Error fetching upcoming movies: $errorMessage")
             }
         }
     }
@@ -52,9 +84,6 @@ class MovieViewModel : ViewModel() {
         return movieList.find { it.id.toString() == id } ?: Movie(0, "Unknown", "", "Unknown", "", 0f, 0, false)
     }
 
-
-
-
     // New methods to get the average rating and vote count of a movie
     fun getAverageRating(movie: Movie): Float {
         return movie.vote_average
@@ -69,5 +98,4 @@ class MovieViewModel : ViewModel() {
             movie.title.contains(searchText, ignoreCase = true)
         }
     }
-
 }
